@@ -1,0 +1,56 @@
+---
+title: "**_Project Report - Air Pollution in American Cities_**"
+date: "June 8, 2023"
+output: 
+  pdf_document: default
+bibliography: bibliography.bib
+header-includes:
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+---
+
+\bcenter
+
+$~$
+$~$
+$~$
+
+Authors
+
+-----------------------------------------------------------
+
+Tuomas Rickansrud - trickansrud@ucdavis.edu
+
+Lizzy Stampher - estampher@ucdavis.edu
+
+Emilio Barbosa Valdiosera - ebarbosavaldiosera@ucdavis.edu
+
+Jianing Zhu - jnzhu@ucdavis.edu
+
+-----------------------------------------------------------
+
+Instructor: Dr. Xiucai Ding
+
+STA 135 - Multivariate Data Analysis
+
+University of California, Davis
+
+$~$
+$~$
+$~$
+
+\ecenter
+
+\newpage
+
+```{r}
+# Initialize data
+library(HSAUR2)
+data(USairpollution)
+```
+
+```{r}
+
+USairpollution
+```
+
