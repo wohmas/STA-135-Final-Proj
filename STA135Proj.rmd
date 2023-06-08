@@ -50,7 +50,9 @@ data(USairpollution)
 ```
 
 ```{r}
-
-USairpollution
+hist(USairpollution$wind)
 ```
 
+```{r}
+
+```
