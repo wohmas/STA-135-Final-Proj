@@ -52,11 +52,17 @@ knitr::opts_chunk$set(echo = TRUE)
 Air quality is an extremely important component of life on Earth. [Health claims]. As such, the present analysis will focus on the US Air pollution data set and seek to answer which variables might best predict air pollution levels, as well as ranking the performance of the cities. The data set, sourced from [Biometry], features the following variables:
 
 SO2: Measures of the air pollutant sulphur dioxide, in micrograms per cubic meter.
+
 temp: Average annual temperatures, in Fahrenheit.
+
 manu: The number of manufacturing enterprises with 20 or more workers.
+
 popul: Population size, in thousands, as of 1970.
+
 wind: Average annual wind speed, in miles per hour.
+
 precip: Average annual precipitation, in inches.
+
 predays: Average number of days with precipitation, per year.
 
 ```{r}
