@@ -179,5 +179,11 @@ PCA$scores
 ```
 
 ```{r}
-
+#ranking of cities via PCs
+pc1_scores = PCA$scores[, 1]
+city_names = rownames(PCA$scores)
+rankings = data.frame(City = city_names, PC1_Score = pc1_scores)
+rankings = rankings[order(-rankings$PC1_Score), ]
+rankings
 ```
+Here is a data frame with city names and their associated PC1 scores. The data frame is sorted descendingly by PC1 scores to show the rankings. PC1 represents the overall air pollution level. Higher PC1 scores, which indicate higher levels of air pollution, are seen in the top cities in the ranking, including Charleston, Little Rock, and Wilmington. Cities at the bottom of the list, such as Milwaukee, Houston, and Minneapolis, have lower PC1 scores, indicating comparatively lower levels of air pollution.
