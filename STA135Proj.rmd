@@ -178,6 +178,8 @@ ggbiplot(PCA, labels = rownames(PCA$scores))
 PCA$scores
 ```
 
+## Ranking
+
 ```{r}
 #ranking of cities via PCs
 pc1_scores = PCA$scores[, 1]
