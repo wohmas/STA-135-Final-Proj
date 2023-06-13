@@ -45,14 +45,6 @@ $~$
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-
-library('GGally')
-library('ggplot2')
-library('MVA')
-library('ggbiplot')
-library('dplyr')
-library('HSAUR2')
 ```
 
 ## Introduction
@@ -66,6 +58,15 @@ popul: Population size, in thousands, as of 1970.
 wind: Average annual wind speed, in miles per hour.
 precip: Average annual precipitation, in inches.
 predays: Average number of days with precipitation, per year.
+
+```{r}
+library('GGally')
+library('ggplot2')
+library('MVA')
+library('ggbiplot')
+library('dplyr')
+library('HSAUR2')
+```
 
 ```{r}
 # Initialize data
