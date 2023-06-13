@@ -43,14 +43,132 @@ $~$
 
 \newpage
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library('GGally')
+library('ggplot2')
+library('MVA')
+library('ggbiplot')
+library('dplyr')
+library('HSAUR2')
+```
+
+## Introduction
+
+Air quality is an extremely important component of life on Earth. [Health claims]. As such, the present analysis will focus on the US Air pollution data set and seek to answer which variables might best predict air pollution levels, as well as ranking the performance of the cities. The data set, sourced from [Biometry], features the following variables:
+
+SO2: Measures of the air pollutant sulphur dioxide, in micrograms per cubic meter.
+temp: Average annual temperatures, in Fahrenheit.
+manu: The number of manufacturing enterprises with 20 or more workers.
+popul: Population size, in thousands, as of 1970.
+wind: Average annual wind speed, in miles per hour.
+precip: Average annual precipitation, in inches.
+predays: Average number of days with precipitation, per year.
+
 ```{r}
 # Initialize data
-library(HSAUR2)
 data(USairpollution)
+data = USairpollution
+```
+
+## ANALYSIS
+
+As a first step, box plots for all the variables are plotted to check their distributions and spot potential outliers.
+
+```{r}
+# Set up a multi-panel plot
+par(mfrow = c(2, 4), mar = c(2, 2, 2, 2))  # adjust as needed
+
+# Create a boxplot for each column
+for (name in colnames(data)) {
+        boxplot(data[[name]], main = name, cex=1)
+    }
+```
+
+Further, a scatterplot matrix is used to check all combinations of pair-wise scatterplots, as well as their correlation coefficients:
+
+```{r}
+ggpairs(data, progress=FALSE)
+```
+
+In the box plots, outliers in the manufacturing and population variables immediately stand out, as they appear to be very far from their distributions. This causes their box plots to be drawn very narrowly to fit the full distribution. Extreme values are also apparent across multiple scatterplots
+
+
+The process of identifying outliers in the multivariate setting is surprisingly challenging due to the nature of higher dimensional data, and more advanced methods of outlier detection appear to be outside of the scope of this course, but a somewhat rudimentary method obtained by [citations] involves the use of a bivariate box plot, which is applied to the manufacturing and population variables to further investigate their outliers:
+
+```{r}
+largest_manu = order(data$manu, decreasing=TRUE)[1:4]
+x = data[, c("manu", "popul")]
+bvbox(x, mtitle = 'Bivariate box plot of manu vs. popul', xlab = 'manu', ylab = 'popul')
+text(x[largest_manu,1], x[largest_manu,2], labels = rownames(x[largest_manu,]), cex = 0.7, pos = 1)
+```
+
+This bivariate box plot, with outliers labeled, indicates that the cities which may be useful to exclude from further analysis are Chicago, Philadelphia, Detroit, and Cleveland.
+
+```{r}
+# removal of outlier cities
+data = data[!rownames(data) %in% c('Chicago','Philadelphia','Detroit','Cleveland'), ]
+```
+
+After removing the four cities, we check the scatterplot matrix again:
+
+```{r pressure, echo=FALSE}
+ggpairs(data, progress=FALSE)
+```
+
+and the scatterplots look much improved, with fewer extreme-looking points.
+
+## PCA
+
+In order to answer the questions about which variables are most important for predicting air pollution levels and how the cities rank against each other, we use the multivariate analysis method of PCA.
+
+This data set includes multiple different variables with different scales and units of measurement. Therefore, we prefer to use the correlation matrix in PCA rather than the covariance matrix, as the correlation matrix is the covariance matrix in a standardized form.
+
+```{r}
+cor = cor(data[,-1])
 ```
 
 ```{r}
-hist(USairpollution$wind)
+#PCA
+val = eigen(cor)$values
+vec = eigen(cor)$vectors
+par(mfrow=c(2,1))
+plot(val,type="b",main="Scree Plot")
+screeplot(princomp(cor),main="Scree Plot")
+cumsum(val)/7
+par(mfrow=c(1,1))
+plot(cumsum(val)/7,type="b",main="Cumulative percentage Plot")
+
+
+l1=vec[1:6,1]%*%t(cor)
+l2=vec[1:6,2]%*%t(cor)
+plot(-l1[1,], l2[1,])
+plot(sort(-l1[1,]))
+```
+
+```{r}
+PCA = princomp(data[,-1], cor=T)
+PCA
+loadings(PCA)
+summary(PCA)
+par(mfrow=c(2,2))
+biplot(PCA,choices=c(1,3))
+biplot(PCA,choices=c(3,3))
+biplot(PCA,choices=c(1,2))
+biplot(PCA,choices=c(3,2))
+```
+
+
+```{r}
+ggbiplot(PCA, labels = rownames(PCA$scores))
+#text(PCA$scores[,1], PCA$scores[,2], labels = rownames(PCA$scores), cex = 0.7, pos = 1)
+```
+
+
+```{r}
+PCA$scores
 ```
 
 ```{r}
