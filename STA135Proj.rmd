@@ -15,17 +15,17 @@ $~$
 $~$
 $~$
 
-Authors
+Authors:
 
 -----------------------------------------------------------
 
-Tuomas Rickansrud - trickansrud@ucdavis.edu
+Tuomas Rickansrud - trickansrud@ucdavis.edu. Contributions: PCA component selection, MLR
 
-Lizzy Stampher - estampher@ucdavis.edu
+Lizzy Stampher - estampher@ucdavis.edu. Contributions: PCA implementation, bivariate box plot implementation
 
-Emilio Barbosa Valdiosera - ebarbosavaldiosera@ucdavis.edu
+Emilio Barbosa Valdiosera - ebarbosavaldiosera@ucdavis.edu. Contributions: Introduction, exploratory analysis, conclusion
 
-Jianing Zhu - jnzhu@ucdavis.edu
+Jianing Zhu - jnzhu@ucdavis.edu. Contributions: City PCA rankings
 
 -----------------------------------------------------------
 
