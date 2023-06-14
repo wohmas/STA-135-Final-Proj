@@ -56,23 +56,23 @@ library('dplyr')
 library('HSAUR2')
 ```
 
-## Introduction
+### Introduction
 
 Air quality is an extremely important component of life on Earth. [Health claims]. As such, the present analysis will focus on the US Air pollution data set and seek to answer which variables might best predict air pollution levels, as well as ranking the performance of the cities. The data set, sourced from [Biometry], features the following variables:
 
-SO2: Measures of the air pollutant sulphur dioxide, in micrograms per cubic meter.
+**SO2:** Measures of the air pollutant sulphur dioxide, in micrograms per cubic meter.
 
-temp: Average annual temperatures, in Fahrenheit.
+**temp:** Average annual temperatures, in Fahrenheit.
 
-manu: The number of manufacturing enterprises with 20 or more workers.
+**manu:** The number of manufacturing enterprises with 20 or more workers.
 
-popul: Population size, in thousands, as of 1970.
+**popul:** Population size, in thousands, as of 1970.
 
-wind: Average annual wind speed, in miles per hour.
+**wind:** Average annual wind speed, in miles per hour.
 
-precip: Average annual precipitation, in inches.
+**precip:** Average annual precipitation, in inches.
 
-predays: Average number of days with precipitation, per year.
+**predays:** Average number of days with precipitation, per year.
 
 ```{r, echo=FALSE}
 # Initialize data
@@ -80,7 +80,7 @@ data(USairpollution)
 data = USairpollution
 ```
 
-## ANALYSIS
+### Exploratory analysis
 
 As a first step, box plots for all the variables are plotted to check their distributions and spot potential outliers.
 
@@ -100,7 +100,7 @@ Further, a scatterplot matrix is used to check all combinations of pair-wise sca
 ggpairs(data, progress=FALSE)
 ```
 
-In the box plots, outliers in the manufacturing and population variables immediately stand out, as they appear to be very far from their distributions. This causes their box plots to be drawn very narrowly to fit the full distribution. Extreme values are also apparent across multiple scatterplots. Additionally, a negative correlation between temperature and SO2 can be seen, as well as a positive correlation between the population and manufacturing variables and another positive correlation between the precipitation and days of precipitation variables. This will come up again later when we perform the principal component analysis.
+In the box plots, outliers in the manufacturing and population variables immediately stand out, as they appear to be very far from their distributions. This causes their box plots to be drawn very narrowly to fit the full distribution. Extreme values are also apparent across multiple scatterplots. A negative correlation can be seen between temperature and SO2, as well as a positive correlation between the population and manufacturing variables. A positive correlation between the precipitation and days of precipitation variables is also present. These relationships will come up again later when we perform the principal component analysis.
 
 
 With respect to outliers, the process of identification in the multivariate setting is surprisingly challenging due to the nature of higher dimensional data, and more advanced methods of outlier detection appear to be outside of the scope of this course. However, a somewhat rudimentary method obtained by [citations] involves the use of a bivariate box plot, which is applied to the manufacturing and population variables to further investigate their outliers:
@@ -125,59 +125,38 @@ After removing the four cities, we check the scatterplot matrix again:
 ggpairs(data, progress=FALSE)
 ```
 
-and the scatterplots look much improved, with fewer extreme-looking points.
+and the scatterplots look much improved, with fewer extreme-looking points. We now consider the data suitably pre-processed for the principal component analysis. 
 
-## PCA
+### PCA
 
-In order to answer the questions about which variables are most important for predicting air pollution levels and how the cities rank against each other, we use the multivariate analysis method of PCA. PCA is a way of re-expressing the data in terms of new vectors, where each vector is orthogonal to the the other vectors and therefore can be considered independent. These vectors are generated from the variance of the data set, so that their orthogonal dimensions also capture its variance. 
+In order to answer the questions about which variables are most important for predicting air pollution levels and how the cities rank against each other, we use the multivariate analysis method of PCA. PCA is a way of re-expressing the variables in a data set by combining them together into a new set of variables, called principal components. These components are created such that they are mathematically independent from each other, which allows one to select a subset of only the most important combinations of variables, which will reduce the overall complexity and dimensionality of the data set. Because these new variables are generated from the data set's measures of variance, the subset selected represents the variables which "explain" the highest amount of variability in the data.
 
 This data set includes multiple different variables with different scales and units of measurement. Therefore, we prefer to use the correlation matrix in PCA rather than the covariance matrix, as the correlation matrix is the covariance matrix in a standardized form.
 
-We also make another decision for the sake of interpretability: Noting the negative association between the temperature variable and the SO2 variable that can be seen in the scatterplot matrix, we flip the sign of the temperature variable, so that "increasing" values in the negative temperature track with increasing values in the other variables, and thus makes correlations between the principle components easier to see.
+We also make another decision for the sake of interpretability: Noting the negative association between the temperature variable and the SO2 variable that can be seen in the scatterplot matrix, we flip the sign of the temperature variable, so that "increasing" values in the negative temperature track with increasing values in the other variables, and thus makes correlations between the principal components easier to see.
 
-```{r}
+The principal components are calculated and output as follows:
+
+```{r, echo=FALSE}
 data$temp = -1 * data$temp
+names(data)[names(data) == 'temp'] <- 'neg_temp'
 cor = cor(data[,-1])
 ```
 
-```{r}
-#PCA
-val = eigen(cor)$values
-vec = eigen(cor)$vectors
-par(mfrow=c(2,1))
-plot(val,type="b",main="Scree Plot")
-screeplot(princomp(cor),main="Scree Plot")
-cumsum(val)/6
-par(mfrow=c(1,1))
-plot(cumsum(val)/6,type="b",main="Cumulative percentage Plot")
-
-
-l1=vec[1:6,1]%*%t(cor)
-l2=vec[1:6,2]%*%t(cor)
-plot(-l1[1,], l2[1,])
-plot(sort(-l1[1,]))
-```
-
-```{r}
+```{r, echo=FALSE}
 PCA = princomp(data[,-1], cor=T)
-PCA
 loadings(PCA)
-summary(PCA)
-par(mfrow=c(2,2))
-biplot(PCA,choices=c(1,3))
-biplot(PCA,choices=c(3,3))
-biplot(PCA,choices=c(1,2))
-biplot(PCA,choices=c(3,2))
-screeplot(PCA)
 ```
-```{r}
+What this output seems to imply is that the first principal component weighs the manufacturing and population variables most highly. In the second component, days of precipitation and (negative) temperature receive the greatest weight. The third component also sees highest weights given to (negative) temperature and annual inches of precipitation. The fourth component gives the highest weight to wind speeds, and the fifth and sixth components appear to somewhat repeat the pattern of components one and two, but with the sign of the inches of precipitation weight flipped.
 
-```
 
-```{r}
+```{r, echo=FALSE}
 ggbiplot(PCA, labels = rownames(PCA$scores))
 ```
 
+This biplot of the principal components involves the representation of the variables in the space of best fit, in this case the first two principal components. Here we can see a very interesting picture: The precipitation and (negative) temperature variables are highly correlated with each other, and have the greatest influence on principal component 2. Additionally, the manufacturing and population variables are highly correlated with each other, and have the greatest influence on principal component 1. This is a reflection of what we have seen before in the scatterplot matrices. Interestingly, the wind variable's vector seems to to be traveling right between the other two groups, with perhaps slighly more influence on principal component 1, but implying less of an association with the other directions overall.
+
+This picture seems to imply that the precipitation and temperature variables (with annual days of precipitation of the greatest magnitude), as well as the manufacturing and population variables (with manufacturing of the greatest magnitude, but only very slightly), are most important variables in explaining the way this data set varies.
 
 ```{r}
 PCA$scores
@@ -194,9 +173,3 @@ rankings = rankings[order(-rankings$PC1_Score), ]
 rankings
 ```
 Here is a data frame with city names and their associated PC1 scores. The data frame is sorted descendingly by PC1 scores to show the rankings. PC1 represents the overall air pollution level. Higher PC1 scores, which indicate higher levels of air pollution, are seen in the top cities in the ranking, including Charleston, Little Rock, and Wilmington. Cities at the bottom of the list, such as Milwaukee, Houston, and Minneapolis, have lower PC1 scores, indicating comparatively lower levels of air pollution.
-
-
-
-```{r}
-
-```
